@@ -75,7 +75,7 @@ struct lex_process
     int current_expression_count;
 
     struct buffer* parentheses_buffer;
-    struct lex_process_function* function;
+    struct lex_process_functions* function;
 
     //This will be private data that the lexer does not understand
     // but the person using the lexer does understand
