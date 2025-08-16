@@ -11,9 +11,21 @@ struct pos // position in the file
     const char* filename;
 };
 
+#define NUMERIC_CASE \
+    case '0':       \
+    case '1':       \
+    case '2':       \
+    case '3':       \
+    case '4':       \
+    case '5':       \
+    case '6':       \
+    case '7':       \
+    case '8':       \
+    case '9'
+    
 enum
 {
-    LEXICIAL_ANALYSIS_ALL_OK,
+    LEXICAL_ANALYSIS_ALL_OK,
     LEXICAL_ANALYSIS_INPUT_ERROR
 };
 
@@ -23,7 +35,7 @@ enum
     TOKEN_TYPE_KEYWORD,
     TOKEN_TYPE_OPERATOR,
     TOKEN_TYPE_SYMBOL,
-    TOEKN_TYPE_NUMBER,
+    TOKEN_TYPE_NUMBER,
     TOKEN_TYPE_STRING,
     TOKEN_TYPE_COMMENT,
     TOKEN_TYPE_NEWLINE
@@ -31,8 +43,8 @@ enum
 struct token
 {
     int type; // for setting the token number based on the token type
-    int flag;
-
+    int flags;
+    struct pos pos;
     union //for setting the tokens (differnt types of token)
     {
         char cval;
@@ -51,13 +63,13 @@ struct token
 };
 
 struct lex_process;
-typedef char (*LEX_PROCESS_NEXT_CHAR)(struct lex_process* process);
-typedef char (*LEX_PROCESS_PEAK_CHAR)(struct lex_process* process);
+typedef char (*LEX_PROCESS_NEXT_CHAR)(struct lex_process* process); // creates a new type, its a pointer to function that takes struct lex_process* process as an argument and returns a char
+typedef char (*LEX_PROCESS_PEEK_CHAR)(struct lex_process* process);
 typedef void (*LEX_PROCESS_PUSH_CHAR)(struct lex_process* process, char c);
 struct lex_process_functions
 {
     LEX_PROCESS_NEXT_CHAR next_char;
-    LEX_PROCESS_PEAK_CHAR peek_char;
+    LEX_PROCESS_PEEK_CHAR peek_char;
     LEX_PROCESS_PUSH_CHAR push_char;
 };
 
@@ -105,12 +117,15 @@ struct compile_process
     FILE *ofile;
 };
 
-int compile_file(const char* filename,const char* out_filename, int flag);
+int compile_file(const char* filename,const char* out_filename, int flags);
 struct compile_process *compile_process_create(const char *filename, const char *filename_out, int flags);
 
 char compile_process_next_char(struct lex_process* lex_process);
 char compile_process_peek_char(struct lex_process* lex_process);
 void compile_process_push_char(struct lex_process* lex_process, char c);
+
+void compiler_error(struct compile_process* compiler, const char* msg, ...);
+void compiler_warning(struct compile_process* compiler, const char* msg, ...);
 
 struct lex_process* lex_process_create(struct compile_process* compiler, struct lex_process_functions* functions, void* private);
 void lex_process_free(struct lex_process* process);

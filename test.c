@@ -1,4 +1,1 @@
-#include<stdio.h>
-int main(){
-    return 0;
-}
+12345 6789 3474 29874
